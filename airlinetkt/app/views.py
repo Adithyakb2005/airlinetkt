@@ -5,6 +5,7 @@ from .models import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
+from .forms import FlightForm
 
 # Create your views here.
 
@@ -70,25 +71,57 @@ def register(req):
     else:
         return render(req, 'user/register.html')
 
-def userhome(req):
-    return render(req, 'user/userhome.html')
+# ----------addflight-----------
+def add_flight(request):
+    if request.method == 'POST':
+        form = FlightForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('flight_list')  # Redirect to a page listing all flights
+    else:
+        form = FlightForm()
+    return render(request, 'admin/add_flight.html', {'form': form})
+
+def flight_list(request):
+    flights = Flight.objects.all()  # Fetch all flights
+    return render(request, 'admin/flight_list.html', {'flights': flights})
 
 def manage_bookings(request):
     bookings = Booking.objects.select_related('flight').all()  # Prefetch related flight data
     return render(request, 'flight_admin_home.html', {'bookings': bookings})
 
-def edit_booking(request, id):
-    booking = Booking.objects.get(pk=id)
+def edit_flight(request, id):
+    flight = Flight.objects.get(pk=id)
     if request.method == 'POST':
-        booking.passenger_name = request.POST.get('passenger_name', booking.passenger_name)
-        booking.date = request.POST.get('date', booking.date)
-        booking.save()
-        return redirect('manage_bookings')
-    return render(request, 'edit_booking.html', {'booking': booking})
+        # Update flight details here
+        flight.flight_number = request.POST['flight_number']
+        flight.origin = request.POST['origin']
+        flight.destination = request.POST['destination']
+        flight.departure_time = request.POST['departure_time']
+        flight.arrival_time = request.POST['arrival_time']
+        flight.available_seats = request.POST['available_seats']
+        flight.save()
+        return redirect('all_flights')  # Or your specific page after editing
 
-def delete_booking(request, id):
-    booking = Booking.objects.get(pk=id)
-    booking.delete()
-    return redirect('manage_bookings')
+    return render(request, 'edit_flight.html', {'flight': flight})
 
-   
+
+def delete_flight(request, id):
+    flight = Flight.objects.get(pk=id)
+    flight.delete()
+    return redirect('all_flights')  # Or your specific page after deleting
+
+# --------------user---------
+def userhome(request):
+    flights = Flight.objects.filter(available_seats__gt=0)  # Only flights with available seats
+    user_bookings = Booking.objects.filter(user=request.user)
+
+    return render(request, 'user/userhome.html', {'flights': flights,'user_bookings': user_bookings})
+
+def book_flight(request, flight_id):
+    flight = Flight.objects.get(id=flight_id)
+    if flight.available_seats > 0:
+        Booking.objects.create(user=request.user, flight=flight, status='Confirmed')
+        flight.available_seats -= 1
+        flight.save()
+    return redirect('userhome')

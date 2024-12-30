@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Flight</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 30px;
+        }
+
+        .form-container {
+            width: 50%;
+            margin: 30px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel-btn {
+            background-color: #dc3545;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Edit Flight Details</h1>
+
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            <label for="flight_number">Flight Number</label>
+            <input type="text" id="flight_number" name="flight_number" value="{{ flight.flight_number }}" required>
+
+            <label for="origin">Origin</label>
+            <input type="text" id="origin" name="origin" value="{{ flight.origin }}" required>
+
+            <label for="destination">Destination</label>
+            <input type="text" id="destination" name="destination" value="{{ flight.destination }}" required>
+
+            <label for="departure_time">Departure Time</label>
+            <input type="datetime-local" id="departure_time" name="departure_time" value="{{ flight.departure_time|date:'Y-m-d\TH:i' }}" required>
+
+            <label for="arrival_time">Arrival Time</label>
+            <input type="datetime-local" id="arrival_time" name="arrival_time" value="{{ flight.arrival_time|date:'Y-m-d\TH:i' }}" required>
+
+            <label for="available_seats">Available Seats</label>
+            <input type="number" id="available_seats" name="available_seats" value="{{ flight.available_seats }}" min="0" required>
+
+            <button type="submit">Save Changes</button>
+            <a href="{% url 'all_flights' %}" class="cancel-btn button" style="text-decoration: none; display: inline-block; text-align: center; padding: 12px 20px; border-radius: 5px; color: white;">Cancel</a>
+        </form>
+    </div>
+
+</body>
+</html>
