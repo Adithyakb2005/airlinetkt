@@ -1,127 +1,120 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib import messages
-from .models import *
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.conf import settings
+from django.contrib import messages
+from django.db import transaction
+from .models import *
 from .forms import FlightForm
 
-# Create your views here.
-
-def user_login(req):
-    if 'admin' in req.session:
-        return redirect(home)
-    if 'user' in req.session:
-        return redirect(userhome)
-    if req.method == 'POST':
-        username = req.POST['username']
-        password = req.POST['password']
-        data = authenticate(username=username, password=password)
-        if data:
-            auth_login(req, data)  # Use the imported auth_login here
-            if data.is_superuser:
-                req.session['admin'] = username  # create
-                return redirect(home)
-            else:
-                req.session['user'] = username
-                return redirect(userhome)
-        else:
-            messages.warning(req, "Invalid username or password.")
-            return redirect(user_login)  # Redirect to the updated function
-    else:
-        return render(req, 'login.html')
-
-def logout(req):
-    auth_logout(req)  # Use the imported auth_logout here
-    req.session.flush()
-    return redirect(user_login)  # Redirect to the updated login view
-
-#---------------------admin------------------------
-
-def home(request):
-    return render(request, 'admin/home.html')
-
-def register(req):
-    if req.method == 'POST':
-        uname = req.POST.get('uname')  # Safely get form values
-        email = req.POST.get('email')
-        pswd = req.POST.get('pswd')
-
-        # Validate form inputs
-        if not uname or not email or not pswd:
-            messages.error(req, "All fields are required.")
-            return redirect('register')  # Use the URL name for redirection
-
+# User Authentication Views
+def user_register(req):
+    if req.method=='POST':
+        username=req.POST['uname']
+        email=req.POST['email']
+        pswd=req.POST['pswd']
         try:
-            # Check if email already exists
-            if User.objects.filter(email=email).exists():
-                messages.warning(req, "Email already in use.")
-                return redirect('register')
-
-            # Create the user
-            data = User.objects.create_user(username=email, email=email, password=pswd, first_name=uname)
+            data=User.objects.create_user(first_name=username,email=email,username=email,password=pswd)
             data.save()
-            messages.success(req, "Registration successful! Please log in.")
-            return redirect('login')  # Redirect to the login page
-        except Exception as e:
-            messages.error(req, f"An error occurred: {e}")
-            return redirect('register')
+        except:
+            messages.warning(req,"email already in use")
+            return redirect(user_register)
 
+        return redirect(user_login)
     else:
-        return render(req, 'user/register.html')
+        return render(req,'user/register.html')
+# def user_register(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#           # Use get() to avoid the error
+#         if not username:
+#             # Handle case where 'username' is not provided
+#             return render(request, 'user/register.html', {'error': 'Username is required'})
 
-# ----------addflight-----------
+#         # Other form handling logic (like password, email, etc.)
+#         user = User.objects.create_user(username=username, password='your_password')
+#         return redirect('user_login')
+#     return render(request, 'user/register.html')
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request,user)
+            return redirect(userhome)
+        else:
+            messages.error(request, "Invalid credentials.")
+    return render(request, 'login.html')
+
+def user_logout(request):
+    auth_logout(request)
+    return redirect(user_login)
+
+# Admin Views
+@login_required
+def admin_home(request):
+    flights=Flight.objects.all()
+    bookings=Booking.objects.all()
+    return render(request, 'admin/home.html',{'flights':flights,'bookings':bookings})
+
+@login_required
 def add_flight(request):
     if request.method == 'POST':
         form = FlightForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('flight_list')  # Redirect to a page listing all flights
+            messages.success(request, "Flight added successfully!")
+            return redirect(flight_list)
     else:
         form = FlightForm()
     return render(request, 'admin/add_flight.html', {'form': form})
 
+@login_required
 def flight_list(request):
-    flights = Flight.objects.all()  # Fetch all flights
+    flights = Flight.objects.all()
     return render(request, 'admin/flight_list.html', {'flights': flights})
 
+@login_required
 def manage_bookings(request):
-    bookings = Booking.objects.select_related('flight').all()  # Prefetch related flight data
-    return render(request, 'flight_admin_home.html', {'bookings': bookings})
+    bookings = Booking.objects.all()
+    return render(request, 'admin/manage_bookings.html', {'bookings': bookings})
 
-def edit_flight(request, id):
-    flight = Flight.objects.get(pk=id)
-    if request.method == 'POST':
-        # Update flight details here
-        flight.flight_number = request.POST['flight_number']
-        flight.origin = request.POST['origin']
-        flight.destination = request.POST['destination']
-        flight.departure_time = request.POST['departure_time']
-        flight.arrival_time = request.POST['arrival_time']
-        flight.available_seats = request.POST['available_seats']
-        flight.save()
-        return redirect('all_flights')  # Or your specific page after editing
-
-    return render(request, 'edit_flight.html', {'flight': flight})
-
-
-def delete_flight(request, id):
-    flight = Flight.objects.get(pk=id)
-    flight.delete()
-    return redirect('all_flights')  # Or your specific page after deleting
-
-# --------------user---------
+# User Views
+@login_required
 def userhome(request):
-    flights = Flight.objects.filter(available_seats__gt=0)  # Only flights with available seats
-    user_bookings = Booking.objects.filter(user=request.user)
+    flights = Flight.objects.filter(available_seats__gt=0)
+    return render(request, 'user/userhome.html', {'flights': flights})
 
-    return render(request, 'user/userhome.html', {'flights': flights,'user_bookings': user_bookings})
-
+@login_required
+def book_flight(request, flight_id,):
+    flight = get_object_or_404(Flight, id=flight_id)
+    with transaction.atomic():
+        if flight.available_seats > 0:
+            Booking.objects.create(user=request.passenger_name, flight=flight)
+            flight.available_seats -= 1
+            flight.save()
+            messages.success(request, "Flight booked successfully!")
+        else:
+            messages.error(request, "No seats available.")
+    return redirect(userhome)
 def book_flight(request, flight_id):
+    user = request.passenger_name  # Get the currently logged-in user
     flight = Flight.objects.get(id=flight_id)
-    if flight.available_seats > 0:
-        Booking.objects.create(user=request.user, flight=flight, status='Confirmed')
-        flight.available_seats -= 1
-        flight.save()
-    return redirect('userhome')
+
+    # Ensure user is passed correctly when creating the Booking object
+    booking = Booking.objects.create(user=user, flight=flight)
+    return redirect('some_view')
+
+
+def save_profile(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        # Save these details to the database or perform desired actions
+        return HttpResponse("Profile updated successfully!")
+    return HttpResponse("Invalid request")

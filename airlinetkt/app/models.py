@@ -11,6 +11,7 @@ class Flight(models.Model):
     available_seats = models.IntegerField()
 
 class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     passenger_name = models.CharField(max_length=100)
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
