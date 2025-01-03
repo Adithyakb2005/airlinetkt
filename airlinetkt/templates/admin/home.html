@@ -23,7 +23,7 @@
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin_home' %}">Dashboard</a>
+                        <a href="{% url 'admin_home' %}">Admin Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'manage_bookings' %}">Manage Bookings</a>
@@ -78,6 +78,7 @@
                     <th>Departure</th>
                     <th>Arrival</th>
                     <th>Date</th>
+                    <th>Price</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -90,6 +91,7 @@
                     <td>{{ booking.departure }}</td>
                     <td>{{ booking.arrival }}</td>
                     <td>{{ booking.date }}</td>
+                    <td>{{ booking.price }}</td>
                     <td>
                         <a href="{% url 'edit_booking' booking.id %}" class="btn btn-primary btn-sm">Edit</a>
                         <a href="{% url 'delete_booking' booking.id %}" class="btn btn-danger btn-sm">Delete</a>
