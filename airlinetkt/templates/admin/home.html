@@ -29,10 +29,10 @@
                         <a class="nav-link" href="{% url 'manage_bookings' %}">Manage Bookings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'add_flight' %}">add flights</a>
+                        <a class="nav-link" href="{% url 'add_flight' %}">Add Flights</a>
                     </li>                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'flight_list' %}">view flights</a>
+                        <a class="nav-link" href="{% url 'flight_list' %}">View Flights</a>
                     </li> 
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'user_logout' %}">Logout</a>
@@ -68,6 +68,7 @@
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
+        
         <h2 class="text-center mb-4">Manage Flight Bookings</h2>
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -75,10 +76,12 @@
                     <th>#</th>
                     <th>Passenger Name</th>
                     <th>Flight Number</th>
+                    <th>Flight Class</th> <!-- Added column for Flight Class -->
                     <th>Departure</th>
                     <th>Arrival</th>
                     <th>Date</th>
                     <th>Price</th>
+                    <th>Available Seats</th> <!-- Added column for Available Seats -->
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -88,10 +91,12 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ booking.passenger_name }}</td>
                     <td>{{ booking.flight_number }}</td>
+                    <td>{{ booking.flight_class }}</td> <!-- Displaying the selected flight class -->
                     <td>{{ booking.departure }}</td>
                     <td>{{ booking.arrival }}</td>
                     <td>{{ booking.date }}</td>
                     <td>{{ booking.price }}</td>
+                    <td>{{ booking.available_seats }}</td> <!-- Displaying available seats -->
                     <td>
                         <a href="{% url 'edit_booking' booking.id %}" class="btn btn-primary btn-sm">Edit</a>
                         <a href="{% url 'delete_booking' booking.id %}" class="btn btn-danger btn-sm">Delete</a>
@@ -99,11 +104,47 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">No bookings available.</td>
+                    <td colspan="10" class="text-center">No bookings available.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Add Flight Form (Admin) -->
+        <h2>Book Flight: {{ flight.flight_number }}</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="passenger_name" class="form-label">Passenger Name</label>
+                <input type="text" class="form-control" id="passenger_name" name="passenger_name" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="flight_class" class="form-label">Flight Class</label>
+                <select class="form-select" id="flight_class" name="flight_class" disabled>
+                    <option value="{{ flight.flight_class }}">{{ flight.flight_class }}</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="available_seats" class="form-label">Available Seats</label>
+                <input type="number" class="form-control" id="available_seats" name="available_seats" value="{{ flight.available_seats }}" disabled>
+            </div>
+            
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="datetime-local" class="form-control" id="date" name="date" required>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Book Now</button>
+        </form>
+
+        {% if error_message %}
+            <div class="alert alert-danger mt-3">{{ error_message }}</div>
+        {% endif %}
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
