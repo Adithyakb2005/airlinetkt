@@ -293,7 +293,7 @@
                         <td>{{ flight.departure_time }}</td>
                         <td>{{ flight.arrival_time }}</td>
                         <td>
-                            <select class="class-select" id="class_{{ flight.id }}" onchange="updateAvailableSeats({{ flight.id }})">
+                            <select class="class-select" id="class{{ flight.id }}" onchange="updateAvailableSeats({{ flight.id }})">
                                 <option value="economy">Economy</option>
                                 <option value="business">Business</option>
                                 <option value="first">First Class</option>
@@ -346,44 +346,37 @@
     <footer>
         <p>&copy; 2024 Flight Booking System. All Rights Reserved.</p>
     </footer>
-
     <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll(".carousel img");
-
-        function showSlide(index) {
-            slides[currentSlide].classList.remove("active");
-            currentSlide = (index + slides.length) % slides.length;
-            slides[currentSlide].classList.add("active");
-        }
-
-        function prevSlide() {
-            showSlide(currentSlide - 1);
-        }
-
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-        }
-
-        setInterval(nextSlide, 5000);
-
         function updateAvailableSeats(flightId) {
-            const selectedClass = document.getElementById(`class_${flightId}`).value;
-            const availableSeatsElement = document.getElementById(`seats_${flightId}`);
-            const priceElement = document.getElementById(`price_${flightId}`);
-
-            // Example logic to adjust available seats and price based on selected class
+            const classSelect = document.getElementById(`class_${flightId}`);
+            const selectedClass = classSelect.value;
+    
+            const row = classSelect.closest('tr');
+            const economySeats = row.dataset.economySeats;
+            const businessSeats = row.dataset.businessSeats;
+            const firstClassSeats = row.dataset.firstClassSeats;
+    
+            const economyPrice = row.dataset.economyPrice;
+            const businessPrice = row.dataset.businessPrice;
+            const firstClassPrice = row.dataset.firstClassPrice;
+    
+            let availableSeats, price;
+    
             if (selectedClass === 'economy') {
-                availableSeatsElement.textContent = "{{ flight.economy_seats }}";
-                priceElement.textContent = "{{ flight.economy_price }}";
+                availableSeats = economySeats;
+                price = economyPrice;
             } else if (selectedClass === 'business') {
-                availableSeatsElement.textContent = "{{ flight.business_seats }}";
-                priceElement.textContent = "{{ flight.business_price }}";
-            } else {
-                availableSeatsElement.textContent = "{{ flight.first_class_seats }}";
-                priceElement.textContent = "{{ flight.first_class_price }}";
+                availableSeats = businessSeats;
+                price = businessPrice;
+            } else if (selectedClass === 'first') {
+                availableSeats = firstClassSeats;
+                price = firstClassPrice;
             }
+    
+            document.getElementById(`seats_${flightId}`).innerText = availableSeats;
+            document.getElementById(`price_${flightId}`).innerText = price;
         }
     </script>
+    
 </body>
 </html>

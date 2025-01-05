@@ -1,0 +1,77 @@
+<!-- edit_booking.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Booking</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .form-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .form-container input, .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .form-container button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .form-container button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Edit Booking</h1>
+    </header>
+    
+    <div class="form-container">
+        <h2>Edit your booking details</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}  <!-- Render the form fields -->
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+
+</body>
+</html>

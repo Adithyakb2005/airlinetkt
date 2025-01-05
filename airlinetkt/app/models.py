@@ -2,35 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+
 class Flight(models.Model):
-    flight_number = models.CharField(max_length=10)
-    origin = models.CharField(max_length=50)
-    destination = models.CharField(max_length=50)
+    flight_number = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)  
+    destination = models.CharField(max_length=100)
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
-    economy_seats = models.IntegerField()
-    business_seats = models.IntegerField()
-    first_class_seats = models.IntegerField()
+    economy_seats = models.IntegerField(default=0)
+    business_seats = models.IntegerField(default=0)
+    first_class_seats = models.IntegerField(default=0)
     economy_price = models.DecimalField(max_digits=10, decimal_places=2)
     business_price = models.DecimalField(max_digits=10, decimal_places=2)
     first_class_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def available_economy_seats(self):
-        booked_economy_seats = Booking.objects.filter(flight=self, class_type='Economy').count()
-        return self.economy_seats - booked_economy_seats
-
-    def available_business_seats(self):
-        booked_business_seats = Booking.objects.filter(flight=self, class_type='Business').count()
-        return self.business_seats - booked_business_seats
-
-    def available_first_class_seats(self):
-        booked_first_class_seats = Booking.objects.filter(flight=self, class_type='First Class').count()
-        return self.first_class_seats - booked_first_class_seats
+    available_seats = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.flight_number} - {self.origin} to {self.destination}"
-
-    
+        return f"{self.flight_number}: {self.origin} to {self.destination}"
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -38,6 +26,8 @@ class Booking(models.Model):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=[('Confirmed', 'Confirmed'),('Cancelled', 'Cancelled'),])
+    class_type = models.CharField(max_length=50)
+
 
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
+from django.http import HttpResponseBadRequest
 from .models import *
 from .forms import *
 
@@ -32,10 +33,12 @@ def user_login(request):
 
         if user:
             login(request, user)
-            if user.groups.filter(name='admin').exists():
-                return redirect('admin_home')
+            if user.is_superuser:
+                request.session['shop']=username #create
+                return redirect(admin_home)
             else:
-                return redirect('userhome')
+                request.session['user']=username 
+                return redirect(userhome)
         else:
             messages.error(request, "Invalid credentials.")
     return render(request, 'login.html')
@@ -68,17 +71,19 @@ def add_flight(request):
 
 
 @login_required
+# def flight_list(request):
+#     flights = Flight.objects.all()
+
+#     for flight in flights:
+       
+#         flight.available_economy_seats = flight.economy_seats - Booking.objects.filter(flight=flight, class_type='Economy').count()
+#         flight.available_business_seats = flight.business_seats - Booking.objects.filter(flight=flight, class_type='Business').count()
+#         flight.available_first_class_seats = flight.first_class_seats - Booking.objects.filter(flight=flight, class_type='First Class').count()
+
+#     return render(request, 'admin/flight_list.html', {'flights': flights})
 def flight_list(request):
-    flights = Flight.objects.all()
-
-    for flight in flights:
-        # Assuming you have a Booking model with class_type field
-        flight.available_economy_seats = flight.economy_seats - Booking.objects.filter(flight=flight, class_type='Economy').count()
-        flight.available_business_seats = flight.business_seats - Booking.objects.filter(flight=flight, class_type='Business').count()
-        flight.available_first_class_seats = flight.first_class_seats - Booking.objects.filter(flight=flight, class_type='First Class').count()
-
-    return render(request, 'admin/flight_list.html', {'flights': flights})
-
+    bookings = Booking.objects.filter(class_type='economy')  # Make sure 'class_type' exists in your model
+    return render(request, 'admin/flight_list.html', {'bookings': bookings})
 
 @login_required
 def manage_bookings(request):
@@ -89,9 +94,16 @@ def manage_bookings(request):
 # --- User Views ---
 @login_required
 def userhome(request):
-    flights = Flight.objects.filter(available_seats__gt=0)
-    user_bookings = Booking.objects.filter(user=request.user)
-    return render(request, 'user/userhome.html', {'flights': flights, 'user_bookings': user_bookings})
+    # Example: Fetching available_seats from the request
+    available_seats = request.GET.get('available_seats', None)
+    
+    if available_seats:
+        flights = Flight.objects.filter(available_seats=available_seats)
+    else:
+        flights = Flight.objects.all()
+
+    context = {'flights': flights}
+    return render(request, 'user/userhome.html', context)
 
 
 @login_required
@@ -99,20 +111,63 @@ def book_flight(request, flight_id):
     flight = get_object_or_404(Flight, id=flight_id)
 
     if request.method == 'POST':
-        if flight.book_seat():
-            booking = Booking.objects.create(
-                passenger_name=request.POST['passenger_name'],
-                flight=flight,
-                price=flight.price,
-                date=request.POST['date']
-            )
-            return redirect('booking_confirmation', booking_id=booking.id)
-        else:
-            error_message = "Sorry, no available seats for this flight."
-            return render(request, 'book_ticket.html', {'flight': flight, 'error_message': error_message})
+        passenger_name = request.POST.get('passenger_name')
+        class_type = request.POST.get('class_type')
+        available_seats = request.POST.get('available_seats')  # Get the available seats value
+        date = request.POST.get('date')
 
-    return render(request, 'book_ticket.html', {'flight': flight})
+        # Debugging: Print all received form data
+        print("Form data:", request.POST)
 
+        # Check if all required fields are present and not empty
+        # if not passenger_name or not class_type or not date or not available_seats:
+        #     return HttpResponseBadRequest("All fields are required.")  
+
+        # Ensure available seats is valid
+        # if int(available_seats) <= 0:
+        #     return HttpResponseBadRequest("No seats available for this class.")
+
+        # Process the booking (example)
+        booking=Booking.objects.create(
+            flight=flight,
+            passenger_name=passenger_name,
+            class_type=class_type,
+            date=date
+        )
+
+        # Reduce available seats for the chosen class
+        if class_type == 'Economy':
+            flight.economy_seats -= 1
+        elif class_type == 'Business':
+            flight.business_seats -= 1
+        elif class_type == 'First':
+            flight.first_seats -= 1
+        flight.save()
+
+        return redirect('success_page')  # Redirect to a success page
+
+    return render(request, 'admin/book_flight.html', {'flight': flight,'booking':booking})
+
+def edit_booking(request, id):
+    booking = get_object_or_404(Booking, id=id)
+    
+    # If it's a POST request, process the form
+    if request.method == 'POST':
+        form = BookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Booking updated successfully.")
+            return redirect('userhome')  # Redirect after successful update
+    else:
+        form = BookingForm(instance=booking)  # Pre-fill the form with existing booking data
+    
+    return render(request, 'admin/edit_booking.html', {'form': form, 'booking': booking})
+
+def delete_booking(request, id):
+    booking = get_object_or_404(Booking, id=id)
+    booking.delete()
+    messages.success(request, "Booking deleted successfully.")
+    return redirect(admin_home) 
 
 @login_required
 def payment_page(request, booking_id):

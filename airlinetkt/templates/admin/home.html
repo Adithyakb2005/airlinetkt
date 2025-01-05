@@ -91,7 +91,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ booking.passenger_name }}</td>
                     <td>{{ booking.flight_number }}</td>
-                    <td>{{ booking.flight_class }}</td> <!-- Displaying the selected flight class -->
+                    <td>{{ booking.class_type }}</td> <!-- Displaying the selected flight class -->
                     <td>{{ booking.departure }}</td>
                     <td>{{ booking.arrival }}</td>
                     <td>{{ booking.date }}</td>
@@ -122,16 +122,34 @@
             </div>
             
             <div class="mb-3">
-                <label for="flight_class" class="form-label">Flight Class</label>
-                <select class="form-select" id="flight_class" name="flight_class" disabled>
-                    <option value="{{ flight.flight_class }}">{{ flight.flight_class }}</option>
+                <label for="class_type" class="form-label">Class Type</label>
+                <select class="form-select" id="class_type" name="class_type" onchange="updateFields()">
+                    <option value="Economy" data-available-seats="{{ flight.economy_seats }}" data-price="{{ flight.economy_price }}"
+                        {% if booking.class_type == "Economy" %}selected{% endif %}>
+                        Economy
+                    </option>
+                    <option value="Business" data-available-seats="{{ flight.business_seats }}" data-price="{{ flight.business_price }}"
+                        {% if booking.class_type == "Business" %}selected{% endif %}>
+                        Business
+                    </option>
+                    <option value="First" data-available-seats="{{ flight.first_seats }}" data-price="{{ flight.first_price }}"
+                        {% if booking.class_type == "First" %}selected{% endif %}>
+                        First
+                    </option>
                 </select>
             </div>
             
             <div class="mb-3">
                 <label for="available_seats" class="form-label">Available Seats</label>
-                <input type="number" class="form-control" id="available_seats" name="available_seats" value="{{ flight.available_seats }}" disabled>
+                <input type="number" class="form-control" id="available_seats" name="available_seats" value="{{ flight.available_seats }}" readonly>
             </div>
+            
+            
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="price" name="price" value="{{ flight.price }}" disabled>
+            </div>
+            
             
             <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
