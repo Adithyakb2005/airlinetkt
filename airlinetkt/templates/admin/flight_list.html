@@ -124,8 +124,9 @@
             <td>{{ flight.first_class_seats }}</td>
             <td>
                 <a href="{% url 'book_flight' flight.id %}" class="book-now">Book Now</a>
-                <a href="{% url 'edit_flight' flight.id %}" class="edit-btn">Edit</a>
+                <a href="{% url 'edit_flight' flight.id %}">Edit Flight</a>
                 <a href="{% url 'delete_flight' flight.id %}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this flight?');">Delete</a>
+
             </td>
         </tr>
         {% endfor %}
