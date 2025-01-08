@@ -120,11 +120,7 @@ def book_flight(request, flight_id):
         # Debugging: Print all received form data
         print("Form data:", request.POST)
 
-        # Validate all required fields
-        # if not passenger_name or not class_type or not date:
-        #     return HttpResponseBadRequest("All fields are required.")
-
-        # Validate the availability of seats
+        # Validate seat availability
         if class_type == 'Economy' and flight.economy_seats <= 0:
             return HttpResponseBadRequest("No economy seats available.")
         elif class_type == 'Business' and flight.business_seats <= 0:
@@ -133,7 +129,15 @@ def book_flight(request, flight_id):
             return HttpResponseBadRequest("No first-class seats available.")
 
         # Create the booking
-        Booking.objects.create(flight=flight,passenger_name=passenger_name,class_type=class_type,date=date,)
+        Booking.objects.create(
+            user=request.user,  # Use the logged-in user
+            flight=flight,
+            passenger_name=passenger_name,
+            class_type=class_type,
+            date=date,
+        )
+
+        # Update the seat count
         if class_type == 'Economy':
             flight.economy_seats -= 1
         elif class_type == 'Business':
@@ -142,28 +146,28 @@ def book_flight(request, flight_id):
             flight.first_class_seats -= 1
 
         flight.save()
-        return redirect('success_page')
+        return redirect(flight_list)
+
     return render(request, 'admin/book_flight.html', {'flight': flight})
 
-def edit_flight(request, id):
-    booking = get_object_or_404(Booking, id=id)
-    
-    # If it's a POST request, process the form
-    if request.method == 'POST':
-        form = BookingForm(request.POST, instance=booking)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Booking updated successfully.")
-            return redirect('userhome')  # Redirect after successful update
-    else:
-        form = BookingForm(instance=booking)  # Pre-fill the form with existing booking data
-    
-    return render(request, 'admin/edit_booking.html', {'form': form, 'booking': booking})
 
-def delete_flight(request, id):
-    flight = get_object_or_404(Flight, id=id)
-    flight.delete()
-    return redirect('flight_list')
+def edit_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    if request.method == 'POST':
+        # Handle form submission for editing the booking
+        booking.passenger_name = request.POST.get('passenger_name')
+        booking.class_type = request.POST.get('class_type')
+        booking.date = request.POST.get('date')
+        booking.save()
+        return redirect('admin_home')  # Redirect to admin homepage
+
+    return render(request, 'admin/edit_booking.html', {'booking': booking})
+
+def delete_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    booking.delete()
+    return redirect('admin_home')  # Redirect to the admin homepage
 
 @login_required
 def payment_page(request, booking_id):
@@ -235,23 +239,23 @@ def edit_profile(request):
 
 
 @login_required
-def profile_view(request):
-    user = request.user
-    profile, created = Profile.objects.get_or_create(user=user)
+def profile(request):
+    # Ensure Profile exists
+    profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile saved successfully!')
-            return redirect('profile')
-    else:
-        form = UserProfileForm(instance=profile)
+        # Update Profile with submitted data
+        profile.phone = request.POST.get('phone')
+        profile.address = request.POST.get('address')
+        date_of_birth = request.POST.get('date_of_birth')
 
-    return render(request, 'user/profile.html', {
-        'form': form,
-        'profile': profile,
-    })
+        # Handle empty date_of_birth
+        profile.date_of_birth = date_of_birth if date_of_birth else None
+        profile.save()
+        return redirect('profile')
+
+    return render(request, 'user/profile.html', {'profile': profile})
+
 
 
 @login_required

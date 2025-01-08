@@ -105,7 +105,7 @@
         header {
             text-align: center;
             padding: 20px;
-            background-color: #3498db;
+            background-color: #306a90;
             color: white;
         }
 
@@ -178,7 +178,7 @@
         }
 
         th {
-            background-color: #3498db;
+            background-color: #1e2d37;
             color: white;
         }
 
@@ -191,7 +191,7 @@
         }
 
         a.button {
-            background-color: #3498db;
+            background-color: #055f1c;
             color: white;
             text-decoration: none;
             padding: 8px 12px;
@@ -206,7 +206,7 @@
         footer {
             text-align: center;
             padding: 20px;
-            background-color: #2c3e50;
+            background-color: #030506;
             color: white;
         }
 
@@ -244,7 +244,7 @@
             <ul class="navbar-links">
                 <li><a href="{% url 'userhome' %}">Home</a></li>
                 <li><a href="{% url 'book_flight' flight_id=5 %}">Bookings</a></li>
-                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li><a href="{% url 'Profile' %}">Profile</a></li>
                 <li><a href="{% url 'user_logout' %}">Logout</a></li>
             </ul>
         </div>
@@ -324,7 +324,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for booking in user_bookings %}
+                    {% for booking in bookings %}
                     <tr>
                         <td>{{ booking.flight.flight_number }}</td>
                         <td>{{ booking.date }}</td>
@@ -345,7 +345,21 @@
 
     <footer>
         <p>&copy; 2024 Flight Booking System. All Rights Reserved.</p>
+        
+        <div>
+            <p>Follow us:</p>
+            <a href="https://www.facebook.com" target="_blank" title="Facebook">
+                <img src="{% static 'images/facebook.jpg' %}" alt="Facebook" width="20" height="20">
+            </a>
+            <a href="https://www.twitter.com" target="_blank" title="Twitter">
+                <img src="{% static 'images/twitter.png' %}" alt="Twitter" width="20" height="20">
+            </a>
+            <a href="https://www.instagram.com" target="_blank" title="Instagram">
+                <img src="{% static 'images/instagram.jpg' %}" alt="Instagram" width="20" height="20">
+            </a>
+        </div>
     </footer>
+    
     <script>
         function updateAvailableSeats(flightId) {
             const classSelect = document.getElementById(`class_${flightId}`);
