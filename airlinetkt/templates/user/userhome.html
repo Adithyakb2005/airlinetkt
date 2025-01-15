@@ -17,11 +17,11 @@
         nav {
             background-color: #2c3e50;
             color: white;
-            padding: 10px 20px;
+            padding: 15px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .navbar-container {
@@ -104,9 +104,10 @@
 
         header {
             text-align: center;
-            padding: 20px;
+            padding: 50px;
             background-color: #306a90;
             color: white;
+            border-bottom: 2px solid #3498db;
         }
 
         .carousel {
@@ -114,7 +115,7 @@
             height: 450px;
             overflow: hidden;
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
         }
 
         .carousel img {
@@ -143,9 +144,9 @@
             background-color: rgba(0, 0, 0, 0.5);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 15px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             transition: background-color 0.3s ease;
         }
 
@@ -157,9 +158,59 @@
             padding: 20px;
         }
 
-        h2 {
-            color: #2c3e50;
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 22px;
             margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .card p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #7f8c8d;
+        }
+
+        .card .button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .card .button:hover {
+            background-color: #2980b9;
         }
 
         table {
@@ -173,7 +224,7 @@
         }
 
         th, td {
-            padding: 10px;
+            padding: 12px;
             text-align: left;
         }
 
@@ -190,24 +241,12 @@
             background-color: #f1f1f1;
         }
 
-        a.button {
-            background-color: #055f1c;
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        a.button:hover {
-            background-color: #2c3e50;
-        }
-
         footer {
             text-align: center;
             padding: 20px;
             background-color: #030506;
             color: white;
+            margin-top: 40px;
         }
 
         footer a {
@@ -219,21 +258,10 @@
         footer a:hover {
             text-decoration: underline;
         }
-
-        .class-select {
-            margin: 5px 0;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .price-display {
-            margin-top: 10px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
+
     <!-- Navigation Bar -->
     <nav>
         <div class="navbar-container">
@@ -243,7 +271,7 @@
             </div>
             <ul class="navbar-links">
                 <li><a href="{% url 'userhome' %}">Home</a></li>
-                <li><a href="{% url 'view_bookings' %}">Bookings</a></li>
+                <li><a href="{% url 'book_flight' flight_id=1 %}">Bookings</a></li>
                 <li><a href="{% url 'Profile' %}">Profile</a></li>
                 <li><a href="{% url 'user_logout' %}">Logout</a></li>
             </ul>
@@ -269,46 +297,17 @@
         <!-- Available Flights Section -->
         <section>
             <h2>Available Flights</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Origin</th>
-                        <th>Destination</th>
-                        <th>Departure Time</th>
-                        <th>Arrival Time</th>
-                        <th>Class</th>
-                        <th>Available Seats</th>
-                        <th>Price</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for flight in flights %}
-                    <tr data-economy-seats="{{ flight.economy_seats }}" data-business-seats="{{ flight.business_seats }}" data-first-class-seats="{{ flight.first_class_seats }}"
-                        data-economy-price="{{ flight.economy_price }}" data-business-price="{{ flight.business_price }}" data-first-class-price="{{ flight.first_class_price }}">
-                        <td>{{ flight.flight_number }}</td>
-                        <td>{{ flight.origin }}</td>
-                        <td>{{ flight.destination }}</td>
-                        <td>{{ flight.departure_time }}</td>
-                        <td>{{ flight.arrival_time }}</td>
-                        <td>
-                            <select class="class-select" id="class{{ flight.id }}" onchange="updateAvailableSeats({{ flight.id }})">
-                                <option value="economy">Economy</option>
-                                <option value="business">Business</option>
-                                <option value="first">First Class</option>
-                            </select>
-                        </td>
-                        <td id="seats_{{ flight.id }}">{{ flight.economy_seats }}</td>
-                        <td id="price_{{ flight.id }}">{{ flight.economy_price }}</td>
-                        <td>
-                            <a href="{% url 'book_flight' flight.id %}" class="button">Book</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                
-            </table>
+            <div class="card-container">
+                {% for flight in flights %}
+                <div class="card">
+                    <img src="{% static 'images/Air_India.avif' %}" alt="Flight Image">
+                    <h3>{{ flight.flight_number }}</h3>
+                    <p>{{ flight.origin }} to {{ flight.destination }}</p>
+                    
+                    <a href="{% url 'book_flight' flight.id %}" class="button">Book Now</a>
+                </div>
+                {% endfor %}
+            </div>
         </section>
 
         <!-- User Bookings Section -->
@@ -318,28 +317,24 @@
                 <thead>
                     <tr>
                         <th>Flight Number</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
                         <th>Date</th>
                         <th>Status</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
                     <tr>
-                        <td>{{ booking.flights.flight_number }}</td>
+                        <td>{{ booking.flight_number }}</td>
+                        <td>{{ booking.origin }}</td>
+                        <td>{{ booking.destination }}</td>
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.status }}</td>
-                        <td>
-                            {% if booking.status != 'Cancelled' %}
-                            <a href="{% url 'cancel_booking' booking.id %}" class="button" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
-                            {% else %}
-                            Cancelled
-                            {% endif %}
-                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="10" class="text-center">No bookings available.</td>
+                        <td colspan="5">No bookings yet</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -348,53 +343,30 @@
     </main>
 
     <footer>
-        <p>&copy; 2024 Flight Booking System. All Rights Reserved.</p>
-        
-        <div>
-            <p>Follow us:</p>
-            <a href="https://www.facebook.com" target="_blank" title="Facebook">
-                <img src="{% static 'images/facebook.jpg' %}" alt="Facebook" width="20" height="20">
-            </a>
-            <a href="https://www.twitter.com" target="_blank" title="Twitter">
-                <img src="{% static 'images/twitter.png' %}" alt="Twitter" width="20" height="20">
-            </a>
-            <a href="https://www.instagram.com" target="_blank" title="Instagram">
-                <img src="{% static 'images/instagram.jpg' %}" alt="Instagram" width="20" height="20">
-            </a>
-        </div>
+        <p>&copy; 2025 Flyyou. All Rights Reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></p>
     </footer>
-    
+
     <script>
-        function updateAvailableSeats(flightId) {
-            const classSelect = document.getElementById(`class_${flightId}`);
-            const selectedClass = classSelect.value;
-    
-            const row = classSelect.closest('tr');
-            const economySeats = row.dataset.economySeats;
-            const businessSeats = row.dataset.businessSeats;
-            const firstClassSeats = row.dataset.firstClassSeats;
-    
-            const economyPrice = row.dataset.economyPrice;
-            const businessPrice = row.dataset.businessPrice;
-            const firstClassPrice = row.dataset.firstClassPrice;
-    
-            let availableSeats, price;
-    
-            if (selectedClass === 'economy') {
-                availableSeats = economySeats;
-                price = economyPrice;
-            } else if (selectedClass === 'business') {
-                availableSeats = businessSeats;
-                price = businessPrice;
-            } else if (selectedClass === 'first') {
-                availableSeats = firstClassSeats;
-                price = firstClassPrice;
-            }
-    
-            document.getElementById(`seats_${flightId}`).innerText = availableSeats;
-            document.getElementById(`price_${flightId}`).innerText = price;
+        // Carousel Script
+        let currentIndex = 0;
+        const images = document.querySelectorAll('.carousel img');
+        const totalImages = images.length;
+
+        function changeSlide(index) {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (index + totalImages) % totalImages;
+            images[currentIndex].classList.add('active');
         }
+
+        function prevSlide() {
+            changeSlide(currentIndex - 1);
+        }
+
+        function nextSlide() {
+            changeSlide(currentIndex + 1);
+        }
+
+        setInterval(nextSlide, 5000); // Automatically transition every 5 seconds
     </script>
-    
 </body>
 </html>
