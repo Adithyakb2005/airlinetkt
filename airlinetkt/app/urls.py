@@ -22,6 +22,7 @@ urlpatterns = [
     path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
     path('Profile/', views.profile_view, name='Profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
+    path('view_bookings/', views.view_bookings, name='view_bookings'),
 
     # Example of a dynamic URL for booking confirmation
     path('booking_confirmation/<int:booking_id>/', views.booking_confirmation, name='booking_confirmation'),

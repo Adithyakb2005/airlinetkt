@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.contrib import messages
 # from django.db import transaction
 from django.http import HttpResponseBadRequest
@@ -47,7 +48,25 @@ def user_login(request):
 def user_logout(request):
     auth_logout(request)
     return redirect(user_login)
+def view_bookings(request):
+    """
+    View function to display the user's bookings.
+    """
+    user = request.user  # Get the currently logged-in user
 
+    # Fetch bookings associated with the user
+    bookings = Booking.objects.filter(user=user).select_related('flight').order_by('-date')
+
+    # Paginate the bookings (e.g., 5 bookings per page)
+    paginator = Paginator(bookings, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request, 
+        'user/view_bookings.html', 
+        {'bookings': page_obj, 'total_bookings': bookings.count()}
+    )
 
 # --- Admin Views ---
 @login_required

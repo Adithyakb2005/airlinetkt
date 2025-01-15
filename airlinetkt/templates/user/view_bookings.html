@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bookings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #ffffff;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Bookings</h1>
+
+    {% if bookings %}
+    <table>
+        <thead>
+            <tr>
+                <th>Flight Number</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.flight_number }}</td>
+                <td>{{ booking.origin }}</td>
+                <td>{{ booking.destination }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-data">You have no bookings yet.</div>
+    {% endif %}
+</body>
+</html>
