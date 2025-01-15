@@ -88,7 +88,7 @@ def flight_list(request):
 @login_required
 def manage_bookings(request):
     bookings = Booking.objects.all()
-    return render(request, 'admin/manage_bookings.html', {'bookings': bookings})
+    return render(request, "admin/manage_booking.html", {"bookings": bookings})
 
 
 # --- User Views ---
@@ -239,20 +239,20 @@ def edit_profile(request):
 
 
 @login_required
-def profile(request):
+def profile_view(request):
     # Ensure Profile exists
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        # Update Profile with submitted data
+        
         profile.phone = request.POST.get('phone')
         profile.address = request.POST.get('address')
         date_of_birth = request.POST.get('date_of_birth')
 
-        # Handle empty date_of_birth
+        
         profile.date_of_birth = date_of_birth if date_of_birth else None
         profile.save()
-        return redirect('profile')
+        return redirect(profile_view)
 
     return render(request, 'user/profile.html', {'profile': profile})
 
@@ -277,7 +277,8 @@ def buy_ticket(request, flight_id):
     else:
         messages.error(request, f"Sorry, no available seats for flight {flight.flight_number}.")
         return redirect('userhome')
-
+def manage_bookings(request):
+    return render(request, "admin/manage_booking.html")
 
 # --- Booking Confirmation View ---
 def booking_confirmation(request, booking_id):

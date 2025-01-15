@@ -243,7 +243,7 @@
             </div>
             <ul class="navbar-links">
                 <li><a href="{% url 'userhome' %}">Home</a></li>
-                <li><a href="{% url 'book_flight' flight_id=5 %}">Bookings</a></li>
+                <li><a href="{% url 'book_flight' flight_id=1 %}">Bookings</a></li>
                 <li><a href="{% url 'Profile' %}">Profile</a></li>
                 <li><a href="{% url 'user_logout' %}">Logout</a></li>
             </ul>
@@ -336,6 +336,10 @@
                             Cancelled
                             {% endif %}
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center">No bookings available.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

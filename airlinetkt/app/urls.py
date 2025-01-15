@@ -14,12 +14,13 @@ urlpatterns = [
     path('manage_bookings/', views.manage_bookings, name='manage_bookings'),
     path('edit_booking/<int:id>/', views.edit_booking, name='edit_booking'),
     path('delete_booking/<int:booking_id>/', views.delete_booking, name='delete_booking'),
+    path('manage_booking',views.manage_bookings),
     # User URLs (requires login)
     path('userhome/', views.userhome, name='userhome'),
     path('book_flight/<int:flight_id>/', views.book_flight, name='book_flight'),
     path('payment/<int:booking_id>/', views.payment_page, name='payment_page'),
     path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
-    path('Profile/', views.profile, name='Profile'),
+    path('Profile/', views.profile_view, name='Profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
 
     # Example of a dynamic URL for booking confirmation

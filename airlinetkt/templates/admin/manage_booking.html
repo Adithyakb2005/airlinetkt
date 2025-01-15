@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings</title>
+    
+    <!-- Add any additional stylesheets or scripts -->
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+header {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+header nav ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+</style>
+<body>
+    <header>
+        <h1>Manage Bookings</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'admin_home' %}">Home</a></li>
+                <li><a href="{% url 'manage_bookings' %}">Manage Bookings</a></li>
+                <li><a href="{% url 'user_logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Booking List</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Passenger Name</th>
+                        <th>Flight</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.passenger_name }}</td>
+                        <td>{{ booking.flight }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.status }}</td>
+                        <td>
+                            <a href="{% url 'edit_booking' booking.id %}">Edit</a> |
+                            <a href="{% url 'delete_booking' booking.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No bookings available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Airline Booking System</p>
+    </footer>
+</body>
+</html>
