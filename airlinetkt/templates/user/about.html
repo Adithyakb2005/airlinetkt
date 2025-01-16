@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            background-image: url("{% static 'images/aboutimg.webp' %}"); /* Replace with your desired image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        header {
+            text-align: center;
+            padding: 50px;
+            background-color: rgba(48, 106, 144, 0.8); /* Semi-transparent overlay for readability */
+            color: white;
+        }
+        section {
+            padding: 40px;
+            color: #f0eff3;
+        }
+        h2 {
+            color: #306a90;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #030506;
+            color: white;
+        }
+        .team {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+        .team-member {
+            text-align: center;
+        }
+        .team-member img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>About Us</h1>
+    </header>
+
+    <section>
+        <p>We are Flyyou, your trusted airline. We offer the best flight services with a focus on safety, comfort, and affordability. Our mission is to make your travel experience smooth and memorable, whether you're flying for business or leisure.</p>
+        
+        <h2>Our Values</h2>
+        <p>At Flyyou, we prioritize:</p>
+        <ul>
+            <li>Safety: The well-being of our passengers is our top priority.</li>
+            <li>Comfort: We aim to provide a relaxing and enjoyable flight experience.</li>
+            <li>Affordability: We believe in offering competitive prices without compromising on quality.</li>
+        </ul>
+
+        <h2>Meet Our Team</h2>
+        <p>Our team of dedicated professionals works tirelessly to ensure you have the best possible experience. Here are some of the key people behind Flyyou:</p>
+
+        <div class="team">
+            <div class="team-member">
+                <img src="{% static 'images/team1.avif' %}" alt="Team Member 1"> <!-- Replace with your team member's image -->
+                <p><strong>Jane Doe</strong></p>
+                <p>CEO & Founder</p>
+            </div>
+            <div class="team-member">
+                <img src="{% static 'images/team2.jpg' %}" alt="Team Member 2"> <!-- Replace with your team member's image -->
+                <p><strong>John Smith</strong></p>
+                <p>Chief Operating Officer</p>
+            </div>
+            <div class="team-member">
+                <img src="{% static 'images/team3.jpg' %}" alt="Team Member 3"> <!-- Replace with your team member's image -->
+                <p><strong>Emily Johnson</strong></p>
+                <p>Marketing Director</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <a href="{% url 'userhome' %}">Return to Home</a> <!-- Replace with the correct URL if needed -->
+
+        <p>&copy; 2025 Flyyou. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

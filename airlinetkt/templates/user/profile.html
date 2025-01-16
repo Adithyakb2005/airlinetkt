@@ -104,7 +104,7 @@
         </div>
 
         <div class="profile-details">
-            <form action="{% url 'Profile' %}" method="POST">
+            <form action="{% url 'profile' %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="phone"><i class="fas fa-phone"></i> Phone:</label>

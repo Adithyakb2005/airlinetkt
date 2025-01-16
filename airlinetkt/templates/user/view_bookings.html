@@ -48,6 +48,7 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'admin_home' %}">Return to Home</a> 
     <h1>Your Bookings</h1>
 
     {% if bookings %}
@@ -63,13 +64,16 @@
         </thead>
         <tbody>
             {% for booking in bookings %}
+            {% for flight in flights %}
+
             <tr>
-                <td>{{ booking.flight_number }}</td>
-                <td>{{ booking.origin }}</td>
-                <td>{{ booking.destination }}</td>
+                <td>{{ flight.flight_number }}</td>
+                <td>{{ flight.origin }}</td>
+                <td>{{ flight.destination }}</td>
                 <td>{{ booking.date }}</td>
                 <td>{{ booking.status }}</td>
             </tr>
+            {% endfor %}
             {% endfor %}
         </tbody>
     </table>

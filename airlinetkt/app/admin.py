@@ -7,3 +7,4 @@ class FlightAdmin(admin.ModelAdmin):
 admin.site.register(Flight)
 admin.site.register(Booking)
 admin.site.register(Profile)
+admin.site.register(ContactFormSubmission)

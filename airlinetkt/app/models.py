@@ -43,4 +43,9 @@ class Profile(models.Model):
     address = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     
+class ContactFormSubmission(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
 
