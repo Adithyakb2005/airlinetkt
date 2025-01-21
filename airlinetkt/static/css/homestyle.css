@@ -6,18 +6,6 @@ body {
     padding: 0;
 }
 
-.navbar {
-    margin-bottom: 20px;
-}
-
-.navbar-brand {
-    font-size: 1.8rem;
-}
-
-.navbar-nav .nav-link {
-    font-size: 1.1rem;
-}
-
 /* Container Styling */
 .container {
     margin-top: 30px;

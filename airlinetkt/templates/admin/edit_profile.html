@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <img src="{% static 'images/flightlogo.png' %}" alt="Logo" class="logo">
+                <span class="brand-name">FlyYou</span>
+            </div>
+            <ul class="navbar-links">
+                <li><a href="{% url 'userhome' %}">Home</a></li>
+                <li><a href="{% url 'view_bookings' %}">Bookings</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li><a href="{% url 'about' %}">About</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+                <li><a href="{% url 'user_logout' %}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <h2 class="text-center">Edit Your Profile</h2>
+        <div class="card shadow p-4">
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="id_phone_number">Phone Number</label>
+                    {{ form.phone }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_address">Address</label>
+                    {{ form.address }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_date_of_birth">Date of Birth</label>
+                    {{ form.date_of_birth }}
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                <a href="{% url 'profile' %}" class="btn btn-secondary mt-3">Cancel</a>
+            </form>
+        </div>
+        
+        {% if messages %}
+        <div class="mt-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

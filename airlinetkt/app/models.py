@@ -16,7 +16,6 @@ class Flight(models.Model):
     business_price = models.DecimalField(max_digits=10, decimal_places=2)
     first_class_price = models.DecimalField(max_digits=10, decimal_places=2)
     available_seats = models.IntegerField(default=0)
-
     def __str__(self):
         return f"{self.flight_number}: {self.origin} to {self.destination}"
 

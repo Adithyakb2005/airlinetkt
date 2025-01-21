@@ -14,15 +14,17 @@ urlpatterns = [
     path('manage_bookings/', views.manage_bookings, name='manage_bookings'),
     path('edit_booking/<int:booking_id>/', views.edit_booking, name='edit_booking'),
     path('delete_booking/<int:booking_id>/', views.delete_booking, name='delete_booking'),
+    path('edit/<int:flight_id>/', views.edit_flight, name='edit_flight'),
+    path('delete/<int:flight_id>/', views.delete_flight, name='delete_flight'),
 
     # User URLs (requires login)
     path('userhome/', views.userhome, name='userhome'),
     path('book_flight/<int:flight_id>/', views.book_flight, name='book_flight'),
     path('submit_form',views.submit_form),
+    path('ticket/<int:booking_id>/', views.view_ticket_details, name='view_ticket_details'),
     # path('payment/<int:booking_id>/', views.payment_page, name='payment_page'),
     path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
     path('profile/', views.profile_view, name='profile'),
-    path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('view_bookings/', views.view_bookings, name='view_bookings'),
     path('about/', views.about, name='about'),  # About page URL
     path('contact/', views.contact, name='contact'),

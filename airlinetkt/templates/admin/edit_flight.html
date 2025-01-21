@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Bookings</title>
+    <title>Edit Flight</title>
     {% load static %}
     <style>
+        /* General Styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #c9c5e4;
+            background-color: #f4f4f9;
+            color: #333;
         }
 
         /* Navigation Bar */
@@ -73,6 +75,10 @@
             color: #f1c40f;
         }
 
+        .menu-toggle {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .navbar-links {
                 display: none;
@@ -97,92 +103,65 @@
             }
         }
 
+        /* Content Styling */
         .container {
-            max-width: 1000px;
+            max-width: 700px;
             margin: 50px auto;
+            padding: 30px;
             background: #ffffff;
-            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
+        h2 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 20px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        th, td {
+        form input, form select {
             padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
 
-        th {
+        button {
+            padding: 12px;
             background-color: #2c3e50;
-            color: white;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 20px;
-            font-size: 18px;
-            color: #7f8c8d;
-        }
-
-        .cancel-btn {
-            padding: 8px 12px;
-            background-color: #e74c3c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 18px;
         }
 
-        .cancel-btn:hover {
-            background-color: #c0392b;
+        button:hover {
+            background-color: #1a252f;
         }
 
         .back-link {
             display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background-color: #2c3e50;
-            color: white;
+            margin-top: 15px;
+            text-align: center;
+            color: #2c3e50;
             text-decoration: none;
-            border-radius: 5px;
+            font-weight: bold;
         }
 
         .back-link:hover {
-            background-color: #1a252f;
-        }
-
-        .view-btn {
-            padding: 8px 12px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .view-btn:hover {
-            background-color: #2980b9;
+            color: #f1c40f;
         }
     </style>
 </head>
 <body>
 
+    <!-- Navigation Bar -->
     <nav>
         <div class="navbar-container">
             <div class="navbar-brand">
@@ -190,54 +169,36 @@
                 <span class="brand-name">FlyYou</span>
             </div>
             <ul class="navbar-links">
-                <li><a href="{% url 'userhome' %}">Home</a></li>
-                <li><a href="{% url 'view_bookings' %}">Bookings</a></li>
-                <li><a href="{% url 'profile' %}">Profile</a></li>
-                <li><a href="{% url 'about' %}">About</a></li>
-                <li><a href="{% url 'contact' %}">Contact</a></li>
-                <li><a href="{% url 'user_logout' %}">Logout</a></li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'manage_bookings' %}">Manage Bookings</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'add_flight' %}">Add Flights</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'flight_list' %}">View Flights</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'user_logout' %}">Logout</a>
+                </li>
             </ul>
+            <span class="menu-toggle" onclick="document.querySelector('.navbar-links').classList.toggle('active')">☰</span>
         </div>
     </nav>
 
     <div class="container">
-        <h1>Your Bookings</h1>
-
-        {% if bookings %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Flight Number</th>
-                    <th>Origin</th>
-                    <th>Destination</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                <tr>
-                    <td>{{ booking.flight.flight_number }}</td>
-                    <td>{{ booking.flight.origin }}</td>
-                    <td>{{ booking.flight.destination }}</td>
-                    <td>{{ booking.date }}</td>
-                    <td>
-                        <form action="{% url 'cancel_booking' booking.id %}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-                            {% csrf_token %}
-                            <button type="submit" class="cancel-btn">Cancel</button>
-                        </form>
-                    </td>
-                    <td>
-                        <a href="{% url 'view_ticket_details' booking.id %}" class="view-btn">View Details</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="no-data">You have no bookings yet.</div>
-        {% endif %}
+        {% block content %}
+            <h2>Edit Flight: {{ form.instance.flight_number }}</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Update Flight</button>
+            </form>
+            <a href="{% url 'flight_list' %}" class="back-link">Back to Flights</a>
+        {% endblock %}
     </div>
 
 </body>

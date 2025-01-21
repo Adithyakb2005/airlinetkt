@@ -20,10 +20,12 @@ class PaymentForm(forms.Form):
     cvv = forms.CharField(max_length=3, widget=forms.TextInput(attrs={'placeholder': 'CVV', 'type': 'text'}))
     amount = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(attrs={'readonly': 'readonly'}))
 
-class UserProfileForm(forms.ModelForm):
+class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['phone', 'address', 'date_of_birth']
-        # widgets = {
-        #     'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
-        # }
+        widgets = {
+                'phone': forms.TextInput(attrs={'class': 'form-control'}),
+                'address': forms.TextInput(attrs={'class': 'form-control'}),
+                'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            }

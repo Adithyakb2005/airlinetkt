@@ -7,22 +7,11 @@
 </head>
 <body>
     <h1>Booking Confirmation</h1>
-
-    {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <h3>Booking Details</h3>
-    <p><strong>Flight Number:</strong> {{ booking.flight.flight_number }}</p>
-    <p><strong>Passenger Name:</strong> {{ booking.passenger_name }}</p>
-    <p><strong>Status:</strong> {{ booking.status }}</p>
-    <p><strong>Date:</strong> {{ booking.date }}</p>
-    <p><strong>Price:</strong> {{ booking.price }}</p>
-
-    <a href="{% url 'userhome' %}">Back to Home</a>
+    <p>Your booking has been successfully confirmed.</p>
+    <p><strong>Flight Number:</strong> {{ flight.flight_number }}</p>
+    <p><strong>Passenger(s):</strong> {{ passengers|join:", " }}</p>
+    <p><strong>Class Type:</strong> {{ booking.class_type }}</p>
+    <p><strong>Booking Date:</strong> {{ booking.date }}</p>
+    <p><a href="{% url 'view_bookings' %}">View your bookings</a></p>
 </body>
 </html>
