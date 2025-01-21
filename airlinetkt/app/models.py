@@ -16,6 +16,7 @@ class Flight(models.Model):
     business_price = models.DecimalField(max_digits=10, decimal_places=2)
     first_class_price = models.DecimalField(max_digits=10, decimal_places=2)
     available_seats = models.IntegerField(default=0)
+    
     def __str__(self):
         return f"{self.flight_number}: {self.origin} to {self.destination}"
 
@@ -23,7 +24,7 @@ class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     passenger_name = models.CharField(max_length=100)
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     status = models.CharField(max_length=20, choices=[('Confirmed', 'Confirmed'),('Cancelled', 'Cancelled'),])
     class_type = models.CharField(max_length=50)
 
@@ -34,13 +35,14 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_id = models.CharField(max_length=100, unique=True)
     payment_status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Completed', 'Completed'), ('Failed', 'Failed')])
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()
     
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
     address = models.CharField(max_length=255)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(blank=True, null=True)
+    profile_completed = models.BooleanField(default=False)
     
 class ContactFormSubmission(models.Model):
     name = models.CharField(max_length=100)

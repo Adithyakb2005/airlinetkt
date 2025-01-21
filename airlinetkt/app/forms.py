@@ -13,7 +13,14 @@ class FlightForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['passenger_name', 'flight', 'status']
+        fields = ['passenger_name', 'flight', 'status','class_type']
+    CLASS_TYPE_CHOICES = [
+        ('economy', 'Economy'),
+        ('business', 'Business'),
+        ('first', 'First Class'),
+    ]
+
+    class_type= forms.ChoiceField(choices=CLASS_TYPE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 class PaymentForm(forms.Form):
     card_number = forms.CharField(max_length=16, widget=forms.TextInput(attrs={'placeholder': 'Enter Card Number', 'type': 'text'}))
     expiry_date = forms.CharField(max_length=5, widget=forms.TextInput(attrs={'placeholder': 'MM/YY', 'type': 'text'}))
@@ -29,3 +36,8 @@ class UserUpdateForm(forms.ModelForm):
                 'address': forms.TextInput(attrs={'class': 'form-control'}),
                 'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             }
+        
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['phone', 'address','date_of_birth']

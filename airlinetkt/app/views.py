@@ -6,11 +6,23 @@ from django.db import transaction
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import User, Flight, Booking, Profile, ContactFormSubmission
+from .models import *
 from .forms import *
 
 # --- User Authentication Views ---
+def home(request):
+    available_flights = Flight.objects.filter()  # Filter only available flights
+    return render(request, 'index.html', {'flights': available_flights})
 
+def search_flights(request):
+    from_location = request.POST['from']
+    to_location = request.POST['to']
+    departure_date = request.POST['departure']
+    return_date = request.POST.get('return', None)
+    passengers = request.POST['passengers']
+
+    # For now, just return the input data as a response
+    return f"Searching flights from {from_location} to {to_location} on {departure_date} for {passengers} passenger(s)." + (f" Return on {return_date}." if return_date else "")
 def user_register(request):
     if request.method == 'POST':
         username = request.POST.get('uname')
@@ -41,7 +53,7 @@ def user_login(request):
 
         messages.error(request, "Invalid credentials.")
 
-    return render(request, 'login.html')
+    return render(request, 'admin/login.html')
 
 def user_logout(request):
     auth_logout(request)
@@ -133,7 +145,6 @@ def about(request):
 def contact(request):
     return render(request, 'user/contact.html')
 
-
 def book_flight(request, flight_id):
     flight = get_object_or_404(Flight, id=flight_id)
 
@@ -145,17 +156,19 @@ def book_flight(request, flight_id):
 
         with transaction.atomic():
             flight.refresh_from_db()
-
-            available_seats = 0
+            
             if class_type == 'Economy':
                 available_seats = flight.economy_seats
             elif class_type == 'Business':
                 available_seats = flight.business_seats
             elif class_type == 'First Class':
                 available_seats = flight.first_class_seats
+            else:
+                messages.error(request, "Invalid class type selected.")
+                return redirect('book_flight', flight_id=flight.id)
 
             if available_seats >= seats_requested:
-                # Deduct the requested seats from the flight
+                # Deduct seats based on class type
                 if class_type == 'Economy':
                     flight.economy_seats -= seats_requested
                 elif class_type == 'Business':
@@ -163,26 +176,41 @@ def book_flight(request, flight_id):
                 elif class_type == 'First Class':
                     flight.first_class_seats -= seats_requested
                 
-                # Save updated flight seat counts
                 flight.save()
 
-                # Create booking entries for each seat requested
-                for _ in range(seats_requested):
-                    Booking.objects.create(
-                        user=request.user,
-                        flight=flight,
-                        passenger_name=passenger_name,
-                        class_type=class_type,
-                        date=date,
-                    )
-                return redirect('userhome')
+                # Create a booking
+                booking = Booking.objects.create(
+                    user=request.user,
+                    flight=flight,
+                    passenger_name=passenger_name,
+                    class_type=class_type,
+                    date=date,
+                )
+
+                messages.success(request, "Flight booked successfully!")
+                return redirect('view_ticket_details', booking_id=booking.id)
 
             else:
+                messages.error(request, "Not enough seats available.")
                 return redirect('book_flight', flight_id=flight.id)
 
     return render(request, 'user/book_flight.html', {'flight': flight})
 
 
+def edit_profile_view(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            profile.profile_completed = True  # Mark profile as completed
+            profile.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, 'user/edit_profile.html', {'form': form})
 def view_bookings(request):
     bookings = Booking.objects.filter(user=request.user)
     return render(request, 'user/view_bookings.html', {'bookings': bookings})
@@ -191,17 +219,35 @@ def view_ticket_details(request, booking_id):
     return render(request, 'user/ticket_details.html', {'booking': booking})
 @login_required
 def profile_view(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        profile = None
+
+    # If profile exists and is completed, show the details
+    if profile and profile.profile_completed:
+        return render(request, 'user/profile.html', {'profile': profile, 'profile_completed': True})
+    
+    # Handle form submission if not completed
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
+        form = ProfileForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('profile')
+            if profile:
+                # Update existing profile
+                profile.phone = form.cleaned_data['phone']
+                profile.address = form.cleaned_data['address']
+                profile.date_of_birth = form.cleaned_data['date_of_birth']
+            else:
+                # Create new profile
+                profile = Profile(user=request.user, **form.cleaned_data)
+            profile.profile_completed = True
+            profile.save()
+            return redirect('profile')  # Redirect to profile page to show details
+
     else:
-        form = UserUpdateForm(instance=request.user)
+        form = ProfileForm()
 
-    return render(request, 'user/profile.html', {'form': form})
-
-
+    return render(request, 'user/profile.html', {'form': form, 'profile': profile, 'profile_completed': False})
 
 
 @login_required

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Bookings</title>
     {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -207,6 +208,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Name</th>
                     <th>Flight Number</th>
                     <th>Origin</th>
                     <th>Destination</th>
@@ -218,6 +220,7 @@
             <tbody>
                 {% for booking in bookings %}
                 <tr>
+                    <td>{{ booking.passenger_name }}</td>
                     <td>{{ booking.flight.flight_number }}</td>
                     <td>{{ booking.flight.origin }}</td>
                     <td>{{ booking.flight.destination }}</td>

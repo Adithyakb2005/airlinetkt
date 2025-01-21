@@ -3,7 +3,9 @@ from . import views
 
 urlpatterns = [
     # User Authentication URLs
-    path('', views.user_login, name='user_login'),
+    path('', views.home, name='home'),
+    path('searchflight',views.search_flights,name='search_flights'),
+    path('login', views.user_login, name='user_login'),
     path('register/', views.user_register, name='user_register'),
     path('logout/', views.user_logout, name='user_logout'),
 
@@ -18,6 +20,7 @@ urlpatterns = [
     path('delete/<int:flight_id>/', views.delete_flight, name='delete_flight'),
 
     # User URLs (requires login)
+    path('edit_profile/', views.edit_profile_view, name='edit_profile'),
     path('userhome/', views.userhome, name='userhome'),
     path('book_flight/<int:flight_id>/', views.book_flight, name='book_flight'),
     path('submit_form',views.submit_form),

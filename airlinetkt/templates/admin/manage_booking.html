@@ -148,6 +148,7 @@
                         <th>Passenger Name</th>
                         <th>Flight</th>
                         <th>Date</th>
+                        <th>Class</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -157,9 +158,9 @@
                     <tr>
                         <td>{{ booking.id }}</td>
                         <td>{{ booking.passenger_name }}</td>
-                        <td>{{ booking.flight_number }}</td>
                         <td>{{ booking.flight }}</td>
                         <td>{{ booking.date }}</td>
+                        <td>{{ booking.class_type }}</td>
                         <td>{{ booking.status }}</td>
                         <td>
                             <a href="{% url 'edit_booking' booking.id %}">Edit</a> | 

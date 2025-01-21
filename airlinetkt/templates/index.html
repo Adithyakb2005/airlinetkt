@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booking - Home</title>
+    {%load static%}
+    <link rel="stylesheet" href="{% static 'css/indexstyle.css'%}">
+    <style>
+        .hero {
+            background: url('{% static "images/airport.jpg" %}') no-repeat center center/cover;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .flight-list {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .flight-list h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .flight {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #fff;
+            margin-bottom: 15px;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .flight-details {
+            flex: 1;
+        }
+        .flight-details h3 {
+            margin: 0;
+            color: #007bff;
+        }
+        .flight-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .book-now-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .book-now-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">FlyYou</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'home'%}">Home</a></li>
+                <li><a href="{% url 'user_login'%}">Login</a></li>
+                <li><a href="{% url 'user_register'%}">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Book Your Flight with Ease</h1>
+            <p>Find the best deals on flights to your favorite destinations.</p>
+            <button class="cta-button" onclick="window.location.href='login'">Explore Now</button>
+        </div>
+    </section>
+    <section class="flight-list">
+        <h2>Available Flights</h2>
+    
+        {% if flights %}
+            {% for flight in flights %}
+                <div class="flight">
+                    <div class="flight-details">
+                        <h3>{{ flight.origin }} to {{ flight.destination }}</h3>
+                        <p><strong>Airline:</strong> {{ flight.flight_number }}</p>
+                        <p><strong>Departure:</strong> {{ flight.departure_time }}</p>
+                        <p><strong>Arrival:</strong> {{ flight.arrival_time }}</p>
+                    </div>
+                    <button class="book-now-btn" onclick="window.location.href='login'">Book Now</button>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No available flights at the moment.</p>
+        {% endif %}
+    </section>
+    <section class="features">
+        <div class="feature">
+            <h2>Affordable Prices</h2>
+            <p>Get the best deals on flights with our price comparison feature.</p>
+        </div>
+        <div class="feature">
+            <h2>24/7 Support</h2>
+            <p>Our support team is available around the clock to assist you.</p>
+        </div>
+        <div class="feature">
+            <h2>Global Destinations</h2>
+            <p>Explore over 100+ destinations across the world.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 AirlineBooking. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
