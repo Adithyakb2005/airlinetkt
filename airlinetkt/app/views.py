@@ -145,18 +145,45 @@ def about(request):
 def contact(request):
     return render(request, 'user/contact.html')
 
+from datetime import datetime
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from .models import Flight, Booking
+
 def book_flight(request, flight_id):
     flight = get_object_or_404(Flight, id=flight_id)
 
     if request.method == 'POST':
         passenger_name = request.POST.get('passenger_name')
         class_type = request.POST.get('class_type')
-        date = request.POST.get('date')
+        date_str = request.POST.get('date')  # Get the date from the form
         seats_requested = int(request.POST.get('seats', 1))
 
+        # Debugging: print the received date for inspection
+        print(f"Received date: {date_str}")
+
+        # Validate that date is provided
+        if not date_str:
+            
+            return redirect('book_flight', flight_id=flight.id)
+
+        # Parse the date string into a valid date object
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            
+            return redirect('book_flight', flight_id=flight.id)
+
+        # Additional validation to ensure the date is in the future
+        if date < datetime.today().date():
+            
+            return redirect('book_flight', flight_id=flight.id)
+
+        # Proceed with booking logic inside a transaction
         with transaction.atomic():
             flight.refresh_from_db()
-            
+
+            # Check available seats based on class type
             if class_type == 'Economy':
                 available_seats = flight.economy_seats
             elif class_type == 'Business':
@@ -164,11 +191,12 @@ def book_flight(request, flight_id):
             elif class_type == 'First Class':
                 available_seats = flight.first_class_seats
             else:
-                messages.error(request, "Invalid class type selected.")
+                
                 return redirect('book_flight', flight_id=flight.id)
 
+            # Ensure there are enough seats
             if available_seats >= seats_requested:
-                # Deduct seats based on class type
+                # Deduct the requested number of seats based on class
                 if class_type == 'Economy':
                     flight.economy_seats -= seats_requested
                 elif class_type == 'Business':
@@ -178,23 +206,24 @@ def book_flight(request, flight_id):
                 
                 flight.save()
 
-                # Create a booking
+                # Create a new booking with the valid date
                 booking = Booking.objects.create(
                     user=request.user,
                     flight=flight,
                     passenger_name=passenger_name,
                     class_type=class_type,
-                    date=date,
+                    date=date,  # Pass the parsed date here
                 )
 
-                messages.success(request, "Flight booked successfully!")
+                
                 return redirect('view_ticket_details', booking_id=booking.id)
 
             else:
-                messages.error(request, "Not enough seats available.")
+               
                 return redirect('book_flight', flight_id=flight.id)
 
     return render(request, 'user/book_flight.html', {'flight': flight})
+
 
 
 def edit_profile_view(request):
